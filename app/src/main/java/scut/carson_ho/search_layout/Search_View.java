@@ -1,6 +1,7 @@
 package scut.carson_ho.search_layout;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.Editable;
@@ -29,8 +30,9 @@ public class Search_View extends LinearLayout {
     /*UI组件*/
     private TextView tv_clear;
     private EditText et_search;
-    private TextView tv_tip;
+//    private TextView tv_tip;
     private ImageView iv_search;
+    private LinearLayout search_block;
 
     /*列表及其适配器*/
     private Search_Listview listView;
@@ -39,6 +41,24 @@ public class Search_View extends LinearLayout {
     /*数据库变量*/
     private RecordSQLiteOpenHelper helper ;
     private SQLiteDatabase db;
+
+    // 回调接口变量
+    private  ICallBack mCallBack;
+
+    // 自定义属性设置
+    // 1. 搜索字体属性设置
+    // 字体大小
+    private Float textSizeSearch;
+    // 字体颜色
+    private int textColorSearch;
+    // 字体默认提示
+    private String textHintSearch;
+
+    // 2. 搜索框设置
+    // 高度
+    private int searchBlockHeight;
+    // 颜色
+    private int searchBlockColor;
 
 
     /*三个构造函数*/
@@ -52,12 +72,14 @@ public class Search_View extends LinearLayout {
     public Search_View(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
+        initAttrs(context, attrs);
         init();
     }
 
     public Search_View(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
+        initAttrs(context, attrs);
         init();
     }
 
@@ -65,9 +87,8 @@ public class Search_View extends LinearLayout {
     /*初始化搜索框*/
     private void init(){
 
-        //初始化UI组件
+        // 初始化UI组件
         initView();
-
 
         //实例化数据库SQLiteOpenHelper子类对象
         helper = new RecordSQLiteOpenHelper(context);
@@ -75,18 +96,51 @@ public class Search_View extends LinearLayout {
         // 第一次进入时查询所有的历史记录
         queryData("");
 
-        //"清空搜索历史"按钮
+        /**
+         * "清空搜索历史"按钮
+         */
         tv_clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //清空数据库
+                // 清空数据库->>关注2
                 deleteData();
+                // 模糊搜索空字符 = 显示所有的搜索历史（此时是没有搜索记录的）
                 queryData("");
             }
         });
 
-        //搜索框的文本变化实时监听
+        /**
+         * 监听输入键盘更换后的搜索按键
+         * 调用时刻：点击键盘上的搜索键时
+         */
+        et_search.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                    // 1. 点击搜索按键后，根据输入的搜索字段进行查询
+                    // 注：由于此处需求会根据自身情况不同而不同，所以具体逻辑由开发者自己实现，此处仅留出接口
+                    if (!(mCallBack == null)){
+                        mCallBack.SearchAciton(et_search.getText().toString());
+                    }
+                    Toast.makeText(context, "需要搜索的是" + et_search.getText(), Toast.LENGTH_SHORT).show();
+
+                    // 2. 点击搜索键后，对该搜索字段在数据库是否存在进行检查（查询）->> 关注1
+                    boolean hasData = hasData(et_search.getText().toString().trim());
+                    // 3. 若存在，则不保存；若不存在，则将该搜索字段保存（插入）到数据库，并作为历史搜索记录
+                    if (!hasData) {
+                        insertData(et_search.getText().toString().trim());
+                        queryData("");
+                    }
+                }
+                return false;
+            }
+        });
+
+
+        /**
+         * 搜索框的文本变化实时监听
+         */
         et_search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -98,148 +152,185 @@ public class Search_View extends LinearLayout {
 
             }
 
-            //输入后调用该方法
+            // 输入文本后调用该方法
             @Override
             public void afterTextChanged(Editable s) {
-
-                if (s.toString().trim().length() == 0) {
-                    //若搜索框为空,则模糊搜索空字符,即显示所有的搜索历史
-                    tv_tip.setText("搜索历史");
-                } else {
-                    tv_tip.setText("搜索结果");
-                }
-
-                //每次输入后都查询数据库并显示
-                //根据输入的值去模糊查询数据库中有没有数据
+                // 每次输入后，模糊查询数据库 & 显示
+                // 注：若搜索框为空,则模糊搜索空字符 = 显示所有的搜索历史
                 String tempName = et_search.getText().toString();
-                queryData(tempName);
+                queryData(tempName); // ->>关注1
 
             }
         });
 
 
-        // 搜索框的键盘搜索键
-        // 点击回调
-        et_search.setOnKeyListener(new View.OnKeyListener() {// 输入完后按键盘上的搜索键
-
-
-            // 修改回车键功能
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    // 隐藏键盘，这里getCurrentFocus()需要传入Activity对象，如果实际不需要的话就不用隐藏键盘了，免得传入Activity对象，这里就先不实现了
-//                    ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
-//                            getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-                    // 按完搜索键后将当前查询的关键字保存起来,如果该关键字已经存在就不执行保存
-                    boolean hasData = hasData(et_search.getText().toString().trim());
-                    if (!hasData) {
-                        insertData(et_search.getText().toString().trim());
-
-                        queryData("");
-                    }
-                    //根据输入的内容模糊查询商品，并跳转到另一个界面，这个需要根据需求实现
-                    Toast.makeText(context, "点击搜索", Toast.LENGTH_SHORT).show();
-
-                }
-                return false;
-            }
-        });
-
-
-
-        //列表监听
-        //即当用户点击搜索历史里的字段后,会直接将结果当作搜索字段进行搜索
+        /**
+         * 搜索记录列表（ListView）监听
+         * 即当用户点击搜索历史里的字段后,会直接将结果当作搜索字段进行搜索
+         */
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                //获取到用户点击列表里的文字,并自动填充到搜索框内
+                // 获取用户点击列表里的文字,并自动填充到搜索框内
                 TextView textView = (TextView) view.findViewById(android.R.id.text1);
                 String name = textView.getText().toString();
                 et_search.setText(name);
                 Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-//        // 插入数据，便于测试，否则第一次进入没有数据怎么测试呀？
-//        Date date = new Date();
-//        long time = date.getTime();
-//        insertData("Leo" + time);
-
-        //点击搜索按钮后的事件
-        iv_search.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean hasData = hasData(et_search.getText().toString().trim());
-                if (!hasData) {
-                    insertData(et_search.getText().toString().trim());
-
-                    //搜索后显示数据库里所有搜索历史是为了测试
-                    queryData("");
-                }
-                //根据输入的内容模糊查询商品，并跳转到另一个界面，这个根据需求实现
-                Toast.makeText(context, "clicked!", Toast.LENGTH_SHORT).show();
             }
         });
 
 
-
+//        // 点击搜索按钮后的事件
+//        iv_search.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                boolean hasData = hasData(et_search.getText().toString().trim());
+//                if (!hasData) {
+//                    insertData(et_search.getText().toString().trim());
+//
+//                    //搜索后显示数据库里所有搜索历史是为了测试
+//                    queryData("");
+//                }
+//                //根据输入的内容模糊查询商品，并跳转到另一个界面，这个根据需求实现
+//                Toast.makeText(context, "开始搜索", Toast.LENGTH_SHORT).show();
+//                System.out.println(et_search.getText());
+//            }
+//        });
 
     }
-
-
-
-
 
     /**
      * 封装的函数
      */
 
-    /*初始化组件*/
-    private void initView(){
-        LayoutInflater.from(context).inflate(R.layout.search_layout,this);
-        et_search = (EditText) findViewById(R.id.et_search);
-        tv_clear = (TextView) findViewById(R.id.tv_clear);
-        tv_tip = (TextView) findViewById(R.id.tv_tip);
-        listView = (Search_Listview) findViewById(R.id.listView);
-        iv_search = (ImageView) findViewById(R.id.iv_search);
+    // 初始化属性
+    private void initAttrs(Context context, AttributeSet attrs) {
+
+        // 控件资源名称
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Search_View);
+
+
+        // 搜索框字体的大小（dp）
+        textSizeSearch = typedArray.getDimension(R.styleable.Search_View_textSizeSearch, 30);
+
+        // 搜索框字体颜色（使用十六进制代码，如#333、#8e8e8e）
+        int defaultColor = context.getResources().getColor(R.color.colorDefault); // 默认颜色 = 白色
+        textColorSearch = typedArray.getColor(R.styleable.Search_View_textColorSearch, defaultColor);
+
+        // 搜索框提示内容（String）
+        textHintSearch = typedArray.getString(R.styleable.Search_View_textHintSearch);
+
+        // 搜索框高度
+        searchBlockHeight = typedArray.getInteger(R.styleable.Search_View_searchBlockHeight, 100);
+
+        // 搜索框颜色
+        int defaultColor2 = context.getResources().getColor(R.color.colorDefault); // 默认颜色 = 白色
+        searchBlockColor = typedArray.getColor(R.styleable.Search_View_searchBlockColor, defaultColor2);
+
+        // 释放资源
+        typedArray.recycle();
     }
 
-    /*插入数据*/
+
+
+    /**
+     * 绑定 搜索框 组件
+     */
+
+    private void initView(){
+
+        // 1. 绑定R.layout.search_layout作为搜索框的xml文件
+        LayoutInflater.from(context).inflate(R.layout.search_layout,this);
+
+        // 2. 绑定搜索框EditText
+        et_search = (EditText) findViewById(R.id.et_search);
+        et_search.setTextSize(textSizeSearch);
+        et_search.setTextColor(textColorSearch);
+        et_search.setHint(textHintSearch);
+
+        // 3. 搜索框背景颜色
+        search_block = (LinearLayout)findViewById(R.id.search_block);
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) search_block.getLayoutParams();
+        params.height = searchBlockHeight;
+        search_block.setBackgroundColor(searchBlockColor);
+        search_block.setLayoutParams(params);
+
+        // 4. 历史搜索记录 = ListView显示
+        listView = (Search_Listview) findViewById(R.id.listView);
+
+        // 5. 删除历史搜索记录 按钮
+        tv_clear = (TextView) findViewById(R.id.tv_clear);
+        tv_clear.setVisibility(INVISIBLE);
+
+    }
+
+
+    /**
+     * 关注1
+     * 模糊查询数据 & 显示到ListView列表上
+     */
+    private void queryData(String tempName) {
+
+        // 1. 模糊搜索
+        Cursor cursor = helper.getReadableDatabase().rawQuery(
+                "select id as _id,name from records where name like '%" + tempName + "%' order by id desc ", null);
+        // 2. 创建adapter适配器对象 & 装入模糊搜索的结果
+        adapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1, cursor, new String[] { "name" },
+                new int[] { android.R.id.text1 }, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        // 3. 设置适配器
+        listView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        System.out.println(cursor.getCount());
+        // 当输入框为空 & 数据库中有搜索记录时，显示 "删除搜索记录"按钮
+        if (tempName.equals("") && cursor.getCount() != 0){
+            tv_clear.setVisibility(VISIBLE);
+        }
+        else {
+            tv_clear.setVisibility(INVISIBLE);
+        };
+
+    }
+
+    /**
+     * 关注2：清空数据库
+     */
+    private void deleteData() {
+
+        db = helper.getWritableDatabase();
+        db.execSQL("delete from records");
+        db.close();
+        tv_clear.setVisibility(INVISIBLE);
+    }
+
+    /**
+     * 关注3
+     * 检查数据库中是否已经有该搜索记录
+     */
+    private boolean hasData(String tempName) {
+        // 从数据库中Record表里找到name=tempName的id
+        Cursor cursor = helper.getReadableDatabase().rawQuery(
+                "select id as _id,name from records where name =?", new String[]{tempName});
+        //  判断是否有下一个
+        return cursor.moveToNext();
+    }
+
+    /**
+     * 关注4
+     * 插入数据到数据库，即写入搜索字段到历史搜索记录
+     */
     private void insertData(String tempName) {
         db = helper.getWritableDatabase();
         db.execSQL("insert into records(name) values('" + tempName + "')");
         db.close();
     }
 
-    /*模糊查询数据 并显示在ListView列表上*/
-    private void queryData(String tempName) {
+    /**
+     * 点击键盘中搜索键后的操作，用于接口回调
+     */
+    public void setOnClickSearch(ICallBack mCallBack){
+         this.mCallBack = mCallBack;
 
-        //模糊搜索
-        Cursor cursor = helper.getReadableDatabase().rawQuery(
-                "select id as _id,name from records where name like '%" + tempName + "%' order by id desc ", null);
-        // 创建adapter适配器对象,装入模糊搜索的结果
-        adapter = new SimpleCursorAdapter(context, android.R.layout.simple_list_item_1, cursor, new String[] { "name" },
-                new int[] { android.R.id.text1 }, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-        // 设置适配器
-        listView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
-
-    /*检查数据库中是否已经有该条记录*/
-    private boolean hasData(String tempName) {
-        //从Record这个表里找到name=tempName的id
-        Cursor cursor = helper.getReadableDatabase().rawQuery(
-                "select id as _id,name from records where name =?", new String[]{tempName});
-        //判断是否有下一个
-        return cursor.moveToNext();
-    }
-
-    /*清空数据*/
-    private void deleteData() {
-        db = helper.getWritableDatabase();
-        db.execSQL("delete from records");
-        db.close();
     }
 }

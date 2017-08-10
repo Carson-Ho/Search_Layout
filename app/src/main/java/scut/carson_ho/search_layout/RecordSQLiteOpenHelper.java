@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Created by Carson_Ho on 16/11/15.
  */
-//SQLiteOpenHelper子类用于打开数据库并进行对用户搜索历史记录进行增删减除的操作
+// 继承自SQLiteOpenHelper数据库类的子类
 public class RecordSQLiteOpenHelper extends SQLiteOpenHelper {
 
     private static String name = "temp.db";
@@ -19,7 +19,7 @@ public class RecordSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        //打开数据库，建立了一个叫records的表，里面只有一列name来存储历史记录：
+        // 打开数据库 & 建立了一个叫records的表，里面只有一列name来存储历史记录：
         db.execSQL("create table records(id integer primary key autoincrement,name varchar(200))");
     }
 

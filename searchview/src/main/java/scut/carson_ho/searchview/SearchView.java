@@ -49,6 +49,8 @@ public class SearchView extends LinearLayout {
 
     // 搜索按键回调接口
     private  ICallBack mCallBack;
+    // 返回按键回调接口
+    private  bCallBack bCallBack;
 
     // 自定义属性设置
     // 1. 搜索字体属性设置：大小、颜色 & 默认提示
@@ -214,23 +216,21 @@ public class SearchView extends LinearLayout {
             }
         });
 
+        /**
+         * 点击返回按键后的事件
+         */
+        searchBack.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 注：由于返回需求会根据自身情况不同而不同，所以具体逻辑由开发者自己实现，此处仅留出接口
+                if (!(bCallBack == null)){
+                    bCallBack.BackAciton();
+                }
 
-//        // 点击搜索按钮后的事件
-//        iv_search.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                boolean hasData = hasData(et_search.getText().toString().trim());
-//                if (!hasData) {
-//                    insertData(et_search.getText().toString().trim());
-//
-//                    //搜索后显示数据库里所有搜索历史是为了测试
-//                    queryData("");
-//                }
-//                //根据输入的内容模糊查询商品，并跳转到另一个界面，这个根据需求实现
-//                Toast.makeText(context, "开始搜索", Toast.LENGTH_SHORT).show();
-//                System.out.println(et_search.getText());
-//            }
-//        });
+                //根据输入的内容模糊查询商品，并跳转到另一个界面，这个根据需求实现
+                Toast.makeText(context, "返回到上一页", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -262,6 +262,9 @@ public class SearchView extends LinearLayout {
         // 5. 删除历史搜索记录 按钮
         tv_clear = (TextView) findViewById(R.id.tv_clear);
         tv_clear.setVisibility(INVISIBLE);
+
+        // 6. 返回按键
+        searchBack = (ImageView) findViewById(R.id.search_back);
 
     }
 
@@ -331,6 +334,14 @@ public class SearchView extends LinearLayout {
      */
     public void setOnClickSearch(ICallBack mCallBack){
         this.mCallBack = mCallBack;
+
+    }
+
+    /**
+     * 点击返回后的操作，用于接口回调
+     */
+    public void setOnClickBack(bCallBack bCallBack){
+        this.bCallBack = bCallBack;
 
     }
 }

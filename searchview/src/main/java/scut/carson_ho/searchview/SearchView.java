@@ -31,7 +31,7 @@ public class SearchView extends LinearLayout {
      */
     private Context context;
 
-    // UI组件
+    // 搜索框组件
     private EditText et_search; // 搜索按键
     private TextView tv_clear;  // 删除搜索记录按键
     private LinearLayout search_block; // 搜索框布局
@@ -47,10 +47,9 @@ public class SearchView extends LinearLayout {
     private RecordSQLiteOpenHelper helper ;
     private SQLiteDatabase db;
 
-    // 搜索按键回调接口
-    private  ICallBack mCallBack;
-    // 返回按键回调接口
-    private  bCallBack bCallBack;
+    // 回调接口
+    private  ICallBack mCallBack;// 搜索按键回调接口
+    private  bCallBack bCallBack; // 返回按键回调接口
 
     // 自定义属性设置
     // 1. 搜索字体属性设置：大小、颜色 & 默认提示
@@ -95,7 +94,7 @@ public class SearchView extends LinearLayout {
         // 控件资源名称
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Search_View);
 
-        // 搜索框字体的大小（dp）
+        // 搜索框字体大小（dp）
         textSizeSearch = typedArray.getDimension(R.styleable.Search_View_textSizeSearch, 30);
 
         // 搜索框字体颜色（使用十六进制代码，如#333、#8e8e8e）
@@ -267,7 +266,6 @@ public class SearchView extends LinearLayout {
         searchBack = (ImageView) findViewById(R.id.search_back);
 
     }
-
 
     /**
      * 关注1

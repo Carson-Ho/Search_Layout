@@ -1,12 +1,13 @@
-package scut.carson_ho.search_layout;
+package scut.carson_ho.searchview;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Created by Carson_Ho on 16/11/15.
+ * Created by Carson_Ho on 17/8/10.
  */
+
 // 继承自SQLiteOpenHelper数据库类的子类
 public class RecordSQLiteOpenHelper extends SQLiteOpenHelper {
 
@@ -27,6 +28,5 @@ public class RecordSQLiteOpenHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
-
 
 }

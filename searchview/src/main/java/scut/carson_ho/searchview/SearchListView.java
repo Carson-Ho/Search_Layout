@@ -1,28 +1,27 @@
-package scut.carson_ho.search_layout;
+package scut.carson_ho.searchview;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ListView;
 
 /**
- * Created by Carson_Ho on 16/11/15.
+ * Created by Carson_Ho on 17/8/10.
  */
-//解决ListView和ScrollView的冲突
-public class Search_Listview extends ListView {
-    public Search_Listview(Context context) {
+
+public class SearchListView extends ListView {
+    public SearchListView(Context context) {
         super(context);
     }
 
-    public Search_Listview(Context context, AttributeSet attrs) {
+    public SearchListView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public Search_Listview(Context context, AttributeSet attrs, int defStyle) {
+    public SearchListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     //通过复写其onMeasure方法、达到对ScrollView适配的效果
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,

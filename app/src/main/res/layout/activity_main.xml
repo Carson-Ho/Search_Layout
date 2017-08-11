@@ -8,7 +8,8 @@
     android:background="@color/colorBackground"
     tools:context="scut.carson_ho.search_layout.MainActivity">
 
-    <scut.carson_ho.search_layout.Search_View
+    <scut.carson_ho.searchview.SearchView
+        android:id="@+id/search_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:textSizeSearch="5dp"
@@ -16,5 +17,5 @@
         app:textHintSearch="输入查询关键字"
         app:searchBlockHeight="150"
         app:searchBlockColor="#ffffff"
-        android:id="@+id/search_layout"/>
+        />
 </RelativeLayout>

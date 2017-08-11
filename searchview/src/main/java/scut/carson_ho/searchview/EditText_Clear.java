@@ -1,4 +1,4 @@
-package scut.carson_ho.search_layout;
+package scut.carson_ho.searchview;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -38,7 +38,7 @@ public class EditText_Clear extends android.support.v7.widget.AppCompatEditText 
      * 步骤2：初始化 图标资源
      */
     private void init() {
-        clearDrawable = getResources().getDrawable(R.drawable.delete);
+        clearDrawable = getResources().getDrawable(R.drawable.clear);
         searchDrawable = getResources().getDrawable(R.drawable.search);
 
         setCompoundDrawablesWithIntrinsicBounds(searchDrawable, null,
@@ -51,8 +51,8 @@ public class EditText_Clear extends android.support.v7.widget.AppCompatEditText 
 
         // 另外一个相似的方法：setCompoundDrawables(Drawable left, Drawable top, Drawable right, Drawable bottom)介绍
         // 与setCompoundDrawablesWithIntrinsicBounds（）的区别：可设置图标大小
-          // 传入的Drawable对象必须已经setBounds(x,y,width,height)，即必须设置过初始位置、宽和高等信息
-          // x:组件在容器X轴上的起点 y:组件在容器Y轴上的起点 width:组件的长度 height:组件的高度
+        // 传入的Drawable对象必须已经setBounds(x,y,width,height)，即必须设置过初始位置、宽和高等信息
+        // x:组件在容器X轴上的起点 y:组件在容器Y轴上的起点 width:组件的长度 height:组件的高度
     }
 
 
@@ -116,6 +116,4 @@ public class EditText_Clear extends android.support.v7.widget.AppCompatEditText 
 
 
 }
-
-
 

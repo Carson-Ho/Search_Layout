@@ -1,4 +1,4 @@
-package scut.carson_ho.search_layout;
+package scut.carson_ho.searchview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -21,79 +21,113 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * Created by Carson_Ho on 16/11/15.
+ * Created by Carson_Ho on 17/8/10.
  */
-public class Search_View extends LinearLayout {
 
+public class SearchView extends LinearLayout {
+
+    /**
+     * 初始化成员变量
+     */
     private Context context;
 
-    /*UI组件*/
-    private TextView tv_clear;
-    private EditText et_search;
-//    private TextView tv_tip;
-    private ImageView iv_search;
-    private LinearLayout search_block;
+    // UI组件
+    private EditText et_search; // 搜索按键
+    private TextView tv_clear;  // 删除搜索记录按键
+    private LinearLayout search_block; // 搜索框布局
+    private ImageView searchBack; // 返回按键
 
-    /*列表及其适配器*/
-    private Search_Listview listView;
+
+    // ListView列表 & 适配器
+    private SearchListView listView;
     private BaseAdapter adapter;
 
-    /*数据库变量*/
+    // 数据库变量
+    // 用于存放历史搜索记录
     private RecordSQLiteOpenHelper helper ;
     private SQLiteDatabase db;
 
-    // 回调接口变量
+    // 搜索按键回调接口
     private  ICallBack mCallBack;
 
     // 自定义属性设置
-    // 1. 搜索字体属性设置
-    // 字体大小
+    // 1. 搜索字体属性设置：大小、颜色 & 默认提示
     private Float textSizeSearch;
-    // 字体颜色
     private int textColorSearch;
-    // 字体默认提示
     private String textHintSearch;
 
-    // 2. 搜索框设置
-    // 高度
+    // 2. 搜索框设置：高度 & 颜色
     private int searchBlockHeight;
-    // 颜色
     private int searchBlockColor;
 
-
-    /*三个构造函数*/
-    //在构造函数里直接对搜索框进行初始化 - init()
-    public Search_View(Context context) {
+    /**
+     * 构造函数
+     * 作用：对搜索框进行初始化
+     */
+    public SearchView(Context context) {
         super(context);
         this.context = context;
         init();
     }
 
-    public Search_View(Context context, AttributeSet attrs) {
+    public SearchView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        initAttrs(context, attrs);
-        init();
+        initAttrs(context, attrs); // ->>关注a
+        init();// ->>关注b
     }
 
-    public Search_View(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SearchView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
         initAttrs(context, attrs);
         init();
     }
 
+    /**
+     * 关注a
+     * 作用：初始化自定义属性
+     */
+    private void initAttrs(Context context, AttributeSet attrs) {
 
-    /*初始化搜索框*/
+        // 控件资源名称
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Search_View);
+
+        // 搜索框字体的大小（dp）
+        textSizeSearch = typedArray.getDimension(R.styleable.Search_View_textSizeSearch, 30);
+
+        // 搜索框字体颜色（使用十六进制代码，如#333、#8e8e8e）
+        int defaultColor = context.getResources().getColor(R.color.colorDefault); // 默认颜色 = 白色
+        textColorSearch = typedArray.getColor(R.styleable.Search_View_textColorSearch, defaultColor);
+
+        // 搜索框提示内容（String）
+        textHintSearch = typedArray.getString(R.styleable.Search_View_textHintSearch);
+
+        // 搜索框高度
+        searchBlockHeight = typedArray.getInteger(R.styleable.Search_View_searchBlockHeight, 100);
+
+        // 搜索框颜色
+        int defaultColor2 = context.getResources().getColor(R.color.colorDefault); // 默认颜色 = 白色
+        searchBlockColor = typedArray.getColor(R.styleable.Search_View_searchBlockColor, defaultColor2);
+
+        // 释放资源
+        typedArray.recycle();
+    }
+
+
+    /**
+     * 关注b
+     * 作用：初始化搜索框
+     */
     private void init(){
 
-        // 初始化UI组件
+        // 1. 初始化UI组件->>关注c
         initView();
 
-        //实例化数据库SQLiteOpenHelper子类对象
+        // 2. 实例化数据库SQLiteOpenHelper子类对象
         helper = new RecordSQLiteOpenHelper(context);
 
-        // 第一次进入时查询所有的历史记录
+        // 3. 第1次进入时查询所有的历史搜索记录
         queryData("");
 
         /**
@@ -200,44 +234,10 @@ public class Search_View extends LinearLayout {
 
     }
 
-    /**
-     * 封装的函数
-     */
-
-    // 初始化属性
-    private void initAttrs(Context context, AttributeSet attrs) {
-
-        // 控件资源名称
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Search_View);
-
-
-        // 搜索框字体的大小（dp）
-        textSizeSearch = typedArray.getDimension(R.styleable.Search_View_textSizeSearch, 30);
-
-        // 搜索框字体颜色（使用十六进制代码，如#333、#8e8e8e）
-        int defaultColor = context.getResources().getColor(R.color.colorDefault); // 默认颜色 = 白色
-        textColorSearch = typedArray.getColor(R.styleable.Search_View_textColorSearch, defaultColor);
-
-        // 搜索框提示内容（String）
-        textHintSearch = typedArray.getString(R.styleable.Search_View_textHintSearch);
-
-        // 搜索框高度
-        searchBlockHeight = typedArray.getInteger(R.styleable.Search_View_searchBlockHeight, 100);
-
-        // 搜索框颜色
-        int defaultColor2 = context.getResources().getColor(R.color.colorDefault); // 默认颜色 = 白色
-        searchBlockColor = typedArray.getColor(R.styleable.Search_View_searchBlockColor, defaultColor2);
-
-        // 释放资源
-        typedArray.recycle();
-    }
-
-
 
     /**
-     * 绑定 搜索框 组件
+     * 关注c：绑定搜索框xml视图
      */
-
     private void initView(){
 
         // 1. 绑定R.layout.search_layout作为搜索框的xml文件
@@ -257,7 +257,7 @@ public class Search_View extends LinearLayout {
         search_block.setLayoutParams(params);
 
         // 4. 历史搜索记录 = ListView显示
-        listView = (Search_Listview) findViewById(R.id.listView);
+        listView = (SearchListView) findViewById(R.id.listView);
 
         // 5. 删除历史搜索记录 按钮
         tv_clear = (TextView) findViewById(R.id.tv_clear);
@@ -330,7 +330,7 @@ public class Search_View extends LinearLayout {
      * 点击键盘中搜索键后的操作，用于接口回调
      */
     public void setOnClickSearch(ICallBack mCallBack){
-         this.mCallBack = mCallBack;
+        this.mCallBack = mCallBack;
 
     }
 }

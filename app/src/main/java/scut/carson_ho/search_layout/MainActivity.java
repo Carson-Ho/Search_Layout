@@ -3,16 +3,18 @@ package scut.carson_ho.search_layout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import scut.carson_ho.searchview.SearchView;
+
 public class MainActivity extends AppCompatActivity {
 
 
-    private Search_View searchView;
+    private SearchView searchView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        searchView = (Search_View)findViewById(R.id.search_layout);
+        searchView = (SearchView) findViewById(R.id.search_layout);
 
 //        searchView.setOnClickSearch(new ICallBack() {
 //            @Override

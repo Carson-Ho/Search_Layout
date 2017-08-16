@@ -24,7 +24,6 @@
 ![示意图](http://upload-images.jianshu.io/upload_images/944365-d4c8747adcdafa04.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 - 功能原型
-
 ![示意图](http://upload-images.jianshu.io/upload_images/944365-2fabd5d54e32e8d3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ### 2.3 功能示意

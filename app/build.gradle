@@ -23,6 +23,5 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.carson_ho:Super_EditText:1.0.0'
     compile project(':searchview')
 }

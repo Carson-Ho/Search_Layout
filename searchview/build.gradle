@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release' // 添加bintray插件
 
 android {
     compileSdkVersion 25
@@ -29,3 +30,13 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
 }
+publish {
+    userOrg = 'carson-ho'             // Binary用户名
+    repoName = 'SearchView'          // Binary上的刚才新建的仓库名（Repository）
+    groupId = 'com.carson_ho'        // 依赖名compile 'x:y:z'中的包名x
+    artifactId = 'SearchLayout'        // 依赖名compile 'x:y:z'中的项目名y
+    publishVersion = '1.0.0'          // 依赖名compile 'x:y:z'中的版本号z
+    desc = 'a SearchLayout for Android DIY View'            // 对该开源组件的说明
+    website = 'https://github.com/Carson-Ho/Search_Layout'  // VCS地址，即填写项目上传的Github地址
+}
+

@@ -13,7 +13,7 @@
 
 ![示意图](http://upload-images.jianshu.io/upload_images/944365-54bff60f16c6946d.gif?imageMogr2/auto-orient/strip)
 
-***
+
 ## 2. 功能介绍
 ### 2.1 需求场景
 ![示意图](http://upload-images.jianshu.io/upload_images/944365-3463f141bd4078e8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -24,13 +24,18 @@
 ![示意图](http://upload-images.jianshu.io/upload_images/944365-d4c8747adcdafa04.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 - 功能原型
+
 ![示意图](http://upload-images.jianshu.io/upload_images/944365-2fabd5d54e32e8d3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+
+
 
 ### 2.3 功能示意
 
 ![示意图](http://upload-images.jianshu.io/upload_images/944365-54bff60f16c6946d.gif?imageMogr2/auto-orient/strip)
 
-***
+
 ## 3. 特点
 ### 3.1 功能实用
 - 该搜索框开源库具备除了历史搜索记录功能外，还具备一般的搜索框功能（如一键清空搜索框内容等等）
@@ -42,11 +47,11 @@
 
 ### 3.3 二次开发成本低
 - 本项目已在 `Github`上开源：[地址：SearchLayout](https://github.com/Carson-Ho/Search_Layout)
-- 具备详细的源码分析文档：http://www.jianshu.com/p/3682f6536e49
+- 具备详细的源码分析文档：请看文章[Android开源库：手把手教你实现一个简单好用的搜索框（含历史搜索记录）](http://www.jianshu.com/p/590f00025de3)
 
 所以，在其上做二次开发 & 定制化成本非常低。
 
-***
+
 
 
 # 4. 具体使用
@@ -142,17 +147,17 @@ dependencies {
 ```
 
 
-***
+
 
 # 5. 完整Demo地址
 [Carson_Ho的Github地址：SearchLayout](https://github.com/Carson-Ho/Search_Layout)
 
 ![示意图](http://upload-images.jianshu.io/upload_images/944365-54bff60f16c6946d.gif?imageMogr2/auto-orient/strip)
-***
+
 
 
 ## 6.  源码解析
-请看文章[Android轮子系列：手把手教你实现搜索框（含历史搜索记录）](http://www.jianshu.com/p/3682f6536e49)
+请看文章[Android开源库：手把手教你实现一个简单好用的搜索框（含历史搜索记录）](http://www.jianshu.com/p/590f00025de3)
 
 
 
